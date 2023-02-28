@@ -39,8 +39,8 @@
 // be executed, until you tell the process to stop. 
 
 // This line will tell the process to stop.
-process.exit(0);
-console.log('I am sad line...I will not be printed to console :(');
+//console.log('I am sad line...I will not be printed to console :(');
+//process.exit(0);
 
 // a. Move the sad line above and below `process.exit(0);` to check that the
 // process stops where it is intended to. When you are done, comment out both
@@ -55,6 +55,11 @@ let exercise = 0;
 
 // Your code here!
 
+function exit() {
+    console.log("This is exercise number " + exercise + ".");
+    process.exit();
+}
+ 
 // c. Bonus. Did you realize that JavaScript/Node.JS has three different ways
 // of declaring a function?
 
@@ -129,7 +134,15 @@ exercise = '3a';
 
 // Your code here!
 
-// exit();
+console.log(process.env.METAMASK_1_PRIVATE_KEY);
+
+let privateKey = process.env.METAMASK_1_PRIVATE_KEY;
+if (privateKey === "") {
+    console.log("Private Key for Metamask account 1 missing in env file.");
+}
+
+
+ //exit();
 
 // b. Create an array with all the names of the variables written in the .env
 // file. Then print the lenght of the array.
@@ -138,6 +151,17 @@ exercise = '3a';
 exercise = '3b';
 
 // Your code here!
+
+let variablesToCheck = new Array();
+variablesToCheck = [
+    "INFURA_KEY", "INFURA_GOERLI_API_URL", "INFURA_MAINNET_API_URL",
+    "ALCHEMY_KEY", "ALCHEMY_GOERLI_API_URL", "ALCHEMY_MAINNET_API_URL",
+    "METAMASK_1_ADDRESS", "METAMASK_1_PRIVATE_KEY",
+    "METAMASK_2_ADDRESS", "METAMASK_2_PRIVATE_KEY",
+    "ETHERSCAN_KEY"
+];
+
+console.log("Number of variable to check: " + variablesToCheck.length);
 
 // exit();
 
@@ -152,14 +176,25 @@ exercise = '3b';
 // Solution 1. forEach.
 variablesToCheck.forEach(v => {
     // Your code here!
+    if (!process.env[v]) {
+        console.log(process.env[v])
+        console.log(`Missing ${v}, fix your .env file`);
+    }
 });
 
 // Solution 2. For-loop.
 
 // Your code here!
+for (let index = 0; index < variablesToCheck.length; index++) {
+    const v = variablesToCheck[index];
+    if (!process.env[v]) {
+        console.log(process.env[v])
+        console.log(`Missing ${v}, fix your .env file`);
+    }
+}
 
 
-// exit();
+ //exit();
 
 
 // Exercise 4. Create a Random Wallet.
@@ -172,15 +207,21 @@ const ethers = require("ethers");
 // and the mnenomic phrase.
 // Hint: ethers.Wallet.createRandom();
 
+const wallet = ethers.Wallet.createRandom();
+console.log();
+console.log("Address: " + wallet.address);
+console.log("Private Key: " + wallet.privateKey);
+console.log("Mnemonic: " + wallet.mnemonic);
 
-// exit();
+
+//exit();
 
 // b. Bonus. Print the derivation path of the wallet and check that it is
 // equal to `baseDevPath`. 
 
 exercise = '4b';
 
-let baseDevPath = "m/44'/60'/0'/0/";
+let baseDevPath = "m/44'/60'/0'/0/0";
 
 // Wait is the derication path? 
 // Basically, the mnemonic alone isn't enough to determine an address
@@ -193,9 +234,13 @@ let baseDevPath = "m/44'/60'/0'/0/";
 console.log("Derivation path:", wallet.path);
 
 // Your code here!
+if(wallet.path === baseDevPath) {
+    console.log("The derivation path is correct.");
+} else {
+    console.log("The derivation path is not correct. Please check.");
+}
 
-
-// exit();
+ //exit();
 
 // Exercise 5. Bonus. Create a Hierarchical Deterministic Wallet.
 /////////////////////////////////////////////////////////////////
