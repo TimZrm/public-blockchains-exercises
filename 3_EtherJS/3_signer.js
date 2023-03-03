@@ -20,10 +20,20 @@
 // Hint: As you did in file 1_wallet and 2_provider.
 
 // Your code here!
+require("dotenv").config();
+const ethers = require("ethers");
+
 
 // b. Create a Goerli provider.
 
 // Your code here!
+
+const infura = process.env.INFURA_GOERLI_API_URL + process.env.INFURA_KEY;
+const goerliProvider = new ethers.JsonRpcProvider(infura);
+
+
+
+
 
 // Exercise 1. Create a Signer.
 ///////////////////////////////
@@ -41,15 +51,40 @@
 
 // Your code here!
 
+let signer = new ethers.Wallet(process.env.METAMASK_1_PRIVATE_KEY);
+console.log(signer.address);
+
+
 // Exercise 2. Sign something.
 //////////////////////////////
 
 const sign = async (message = 'Hello world') => {
     
     // Your code here!
+    const signature = await signer.signMessage(message);
+
+    const verifiedSigner = ethers.verifyMessage(message, signature);
+    
+    if (verifiedSigner === signer.address) {
+        console.log('Signature is valid.');
+    }
+    else {
+        console.log('Signature is NOT valid.');
+    }
+
+    let anotherMessage = 'Give me 5 ETH';
+
+    const verifiedSigner2 = ethers.verifyMessage(anotherMessage, signature);
+    
+    if (verifiedSigner2 === signer.address) {
+        console.log('Tampered signature is valid.');
+    }
+    else {
+        console.log('Tampered signature is NOT valid.');
+    }
 };
 
-// sign();
+//  sign();
 
 // Exercise 3. Connect to the blockchain. 
 /////////////////////////////////////////
@@ -63,9 +98,12 @@ const sign = async (message = 'Hello world') => {
 const connect = async() => {
     
     // Your code here!
+    let signer = await signer.connect(goerliProvider);
+    let nonce = await signer.getNonce();
+    console.log("The Nonce is: " + nonce);
 };
 
-// connect();
+//  connect();
 
 // c. Replace the signer created above at exercise 1 with one that takes the 
 // Goerli provider as second parameter. This is necessary even
@@ -75,6 +113,7 @@ const connect = async() => {
 
 // Replace the signer created above.
 
+signer = new ethers.Wallet(process.env.METAMASK_1_PRIVATE_KEY, goerliProvider);
 
 
 // Exercise 4. Send a transaction.
@@ -99,9 +138,34 @@ const account2 = process.env.METAMASK_2_ADDRESS;
 const sendTransaction = async () => {
 
     // Your code here!
+    let b1 = await goerliProvider.getBalance(signer.address);
+    let b2 = await goerliProvider.getBalance(account2);
+    b1 = ethers.formatEther(b1);
+    b2 = ethers.formatEther(b2);
+
+    tx = await signer.sendTransaction({
+        to: account2,
+        value: ethers.parseEther("0.001")
+    })
+
+
+console.log("Transaction is in the Mempool");
+await tx.wait();
+
+console.log("Transaction was mined.");
+
+let newB1 = await goerliProvider.getBalance(signer.address);
+let newB2 = await goerliProvider.getBalance(account2);
+newB1 = ethers.formatEther(newB1);
+newB2 = ethers.formatEther(newB2);
+
+console.log("The balance of account 1 changed from " + b1 + " to " + newB1 + ".");
+console.log("The balance of account 2 changed from " + b2 + " to " + newB2 + ".");
+console.log("The Transaction amount was 0,001");
+
 };
 
-// sendTransaction();
+ //sendTransaction();
 
 
 // Exercise 5. Meddling with Gas.

@@ -134,7 +134,7 @@ exercise = '3a';
 
 // Your code here!
 
-console.log(process.env.METAMASK_1_PRIVATE_KEY);
+//console.log(process.env.METAMASK_1_PRIVATE_KEY);
 
 let privateKey = process.env.METAMASK_1_PRIVATE_KEY;
 if (privateKey === "") {

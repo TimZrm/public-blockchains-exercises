@@ -14,6 +14,13 @@
 
 // Your code here!
 
+require("dotenv").config();
+const { formatEther } = require("ethers");
+const ethers = require("ethers");
+const { add } = require("mathjs");
+
+
+
 
 // Exercise 1. Connect to Mainnet (a.k.a welcome async!).
 /////////////////////////////////////////////////////////
@@ -44,6 +51,11 @@
 
 // Your code here!
 
+let mainnetURL = process.env.INFURA_MAINNET_API_URL + process.env.INFURA_KEY;
+
+const mainnetProvider = new ethers.JsonRpcProvider(mainnetURL);
+
+
 
 // b. Verify that the network's name is "mainnet" and the chain id that theis 1.
 
@@ -59,22 +71,21 @@
 
 // This is an asynchronous anonymous self-executing function. It is a ugly
 // construct, but it allows you to use await inside its body.
-(async () => {
-    
-    // Your code maybe here!
 
-})();
 
 // However, the async function could also be named, and the result is:
 const network = async () => {
-    
+    let net = await mainnetProvider.getNetwork();
+    console.log("Async/Await");
+    console.log("Provider's name: " + net.name);
+    console.log("Network chain ID: " + Number(net.chainId));
     // Your code here!
 
 };
 
 // which you can then call:
 
-// network();
+network();
 
 // The second (less compact) notation has the advantage that we can invoke
 // the code only when needed, so it is preferred in this exercise sheet.
@@ -82,6 +93,8 @@ const network = async () => {
 // b2. Bonus. Re-write the code above using the promise standard notation.
 
 // Promises.
+
+
 
 // Checkpoint. We use `return` to terminate the execution insted
 // of process.exit(). Why?
@@ -99,10 +112,17 @@ const network = async () => {
 const blockNum = async () => {
     
     // Your code here!
+    let latestBlockNumber = await mainnetProvider.getBlockNumber();
+    console.log("Async/Await");
+    console.log("Latest Block Number: " + latestBlockNumber);
+    
+
+    let blockContent = await mainnetProvider.getBlock(latestBlockNumber);
+    console.log("Block miner: " + blockContent.miner);
 
 };
 
-// blockNum();
+ blockNum();
 
 // b. The Ethereum mainnet is one of the most secure blockchains in the world.
 // The testnets of Ethereum are a bit less secure because they might have 
@@ -112,13 +132,21 @@ const blockNum = async () => {
 // Connect to the Goerli test net, get the latest block number and print
 // the difference in chain length with mainnet.
 
+let testnetURL = process.env.INFURA_GOERLI_API_URL + process.env.INFURA_KEY;
+
+const goerliProvider = new ethers.JsonRpcProvider(testnetURL);
+
 
 // Look up the current block number in Mainnet and Goerli.
 const blockDiff = async () => {
-
+    let mainLatestBlock = await mainnetProvider.getBlockNumber();
+    let testLatestBlock = await goerliProvider.getBlockNumber();
+    console.log("Mainnet latest Block Number: "+ mainLatestBlock);
+    console.log("Testnet latest Block Number: "+ testLatestBlock);
+    console.log("The Mainnet has "+ (mainLatestBlock-testLatestBlock) + " more Blocks.");
 };
 
-// blockDiff();
+blockDiff();
 
 
 // Exercise 3. Block time.
@@ -176,7 +204,7 @@ const checkBlockTime = async (providerName = "mainnet", blocks2check = 3) => {
     
 };
 
-// checkBlockTime("Mainnet");
+//  checkBlockTime("Mainnet");
 
 // checkBlockTime("Goerli");
 
@@ -219,10 +247,22 @@ const checkBlockTime2 = async (providerName = "mainnet", blocks2check = 3) => {
 const blockInfo = async () => {
     
     // Your code here!
+    let blockNumber = await mainnetProvider.getBlockNumber();
+    let blockReceipt = await mainnetProvider.getBlock(blockNumber, true);
+    let tx = await blockReceipt.getTransaction(0);
+    let txHash = blockReceipt.transactions[0];
+    let txReceipt = await mainnetProvider.getTransactionReceipt(txHash);
+    
+    
+    // let transactionReceipt = await mainnetProvider.getTransactionReceipt();
+    console.log("The latest Blocknumber on Mainnet is: " + blockNumber);
+    console.log("The Transaction goes from " + txReceipt.from + " to : " + txReceipt.to);
+    console.log(blockReceipt.prefetchedTransactions);
+
 
 };
 
-// blockInfo();
+//  blockInfo();
 
 // Exercise 5. ENS names.
 //////////////////////////
@@ -233,10 +273,14 @@ const blockInfo = async () => {
 const ens = async () => {
     
     // Your code here!
+    let nameResolved = await goerliProvider.resolveName("unima.eth");
+    let address = await goerliProvider.lookupAddress(nameResolved);
 
+    console.log("Resolving the unima.eth results: " + nameResolved);
+    console.log("Looking up the address results to: " + address);
 };
 
-// ens();
+//  ens();
 
 
 // Exercise 6. Get ETH balance.
@@ -257,9 +301,15 @@ const ens = async () => {
 const balance = async (ensName = "unima.eth") => {
 
    // Your code here!
+    let uniBalance = await goerliProvider.getBalance(ensName);
+    console.log("Balance of the University: " + ethers.formatEther(uniBalance));
 
+    let addressUni = await goerliProvider.resolveName(ensName);
+    let uniBalance2 = await goerliProvider.getBalance(addressUni);
+    console.log("Balance of the address: " + ethers.formatEther(uniBalance2));
 };
 
+// balance();
 // balance("vitalik.eth");
 
 
@@ -292,9 +342,12 @@ const linkABI = require('./link_abi.json');
 const link = async () => {
    
     // Your code here!
+    const contract = new ethers.Contract(linkAddress, linkABI, goerliProvider);
+    const linkBalance = await contract.balanceOf("unima.eth");
+    console.log(ethers.formatEther(linkBalance));
 };
 
 
-// link();
+//  link();
 
 
