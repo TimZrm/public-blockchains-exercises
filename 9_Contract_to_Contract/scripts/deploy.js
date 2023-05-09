@@ -10,12 +10,9 @@ const fs = require('fs');
 const path = require('path');
 
 const _saveAddresses = (addresses) => {
-  
-  // Your code here.
-
-  // Must save addresses to file .addresses.json.
-
-  console.log("Deployed addresses saved to .addresses.json")
+  fs.writeFileSync(path.join(__dirname, ".addresses_attack.json"),
+                   JSON.stringify(addresses));
+  console.log("Deployed addresses saved to .addresses_attack.json")
 };
 
 async function main() {
