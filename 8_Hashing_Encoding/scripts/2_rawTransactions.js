@@ -14,7 +14,7 @@ const localhostProvider = new ethers.providers.JsonRpcProvider(
     "http://127.0.0.1:8545"
 );
 
-// Hardhat.
+// Hardhat..
 // const [signer1, signer2] = await hre.ethers.getSigners();
 
 let signer = new ethers.Wallet(
