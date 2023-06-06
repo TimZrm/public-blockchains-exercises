@@ -95,7 +95,7 @@ const guess = async(num = 100) => {
     
 };
 
-// guess(1000);
+ guess(1000);
 
 // Exercise 2. Upgrade the contract to V2.
 //////////////////////////////////////////
